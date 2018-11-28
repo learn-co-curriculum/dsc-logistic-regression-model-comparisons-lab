@@ -260,15 +260,11 @@ plt.legend(loc="lower right")
 plt.show()
 ```
 
-    /Users/matthew.mitchell/anaconda3/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88
-      return f(*args, **kwds)
-
-
     AUC: 0.8996515679442508
 
 
 
-![png](index_files/index_11_2.png)
+![png](index_files/index_11_1.png)
 
 
 ## Update your ROC curve to not only include a graph of the test set, but one of the train set
@@ -365,7 +361,7 @@ plt.colorbar()
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x10d57de80>
+    <matplotlib.colorbar.Colorbar at 0x1a183d1eb8>
 
 
 
@@ -583,15 +579,15 @@ for n in range(8):
     train_auc = auc(train_fpr, train_tpr)
     auc_diff = round(train_auc - test_auc, 4)
 
-#     print('Test AUC with C=10^{}: {}'.format(n*2, auc(test_fpr, test_tpr)))
-#     print('Train AUCwith C=10^{}: {}'.format(n*2, auc(train_fpr, train_tpr)))
+#     print('Test AUC with C=1.5^{}: {}'.format(n*2, auc(test_fpr, test_tpr)))
+#     print('Train AUCwith C=1.5^{}: {}'.format(n*2, auc(train_fpr, train_tpr)))
     # Add the plot
     ax.plot(test_fpr, test_tpr, color='darkorange',
          lw=lw, label='Test ROC curve')
     ax.plot(train_fpr, train_tpr, color='blue',
              lw=lw, label='train ROC curve')
     
-    ax.set_title('Regularization Parameter set to: 10^{}\nDifference in Test/Train AUC: {}'.format(n, auc_diff))
+    ax.set_title('Regularization Parameter set to: 1.5^{}\nDifference in Test/Train AUC: {}'.format(n, auc_diff))
 
 ```
 
