@@ -401,31 +401,209 @@ logreg.fit(X_train, y_train)
 
 ```python
 #Your code here
+y_score = logreg.decision_function(X_test)
 
+fpr, tpr, thresholds = roc_curve(y_test, y_score)
+
+print('AUC: {}'.format(auc(fpr, tpr)))
+plt.figure(figsize=(10,8))
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve')
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.yticks([i/20.0 for i in range(21)])
+plt.xticks([i/20.0 for i in range(21)])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
 ```
+
+    AUC: 0.8996515679442508
+
+
+
+![png](index_files/index_19_1.png)
+
 
 ## As before add an ROC curve to the graph for the train set as well
 
 
 ```python
 #Your code here
+
+y_test_score = logreg.decision_function(X_test)
+y_train_score = logreg.decision_function(X_train)
+
+test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
+train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
+
+print('Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('train AUC: {}'.format(auc(train_fpr, train_tpr)))
+
+plt.figure(figsize=(10,8))
+lw = 2
+plt.plot(test_fpr, test_tpr, color='darkorange',
+         lw=lw, label='Test ROC curve')
+plt.plot(train_fpr, train_tpr, color='blue',
+         lw=lw, label='train ROC curve')
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.yticks([i/20.0 for i in range(21)])
+plt.xticks([i/20.0 for i in range(21)])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
 ```
+
+    Test AUC: 0.8996515679442508
+    train AUC: 0.9291038858049168
+
+
+
+![png](index_files/index_21_1.png)
+
+
+## Adding an Intercept
+
+Now add an intercept to the sci-kit learn model. Keep the regularization parameter C set to a very large number such as 1e16. Plot all three models ROC curves on the same graph.
 
 
 ```python
-## Adding an Intercept
+#Create New Model
+logregi = LogisticRegression(fit_intercept=True, C=1e16)
+logregi.fit(X_train, y_train)
 
-Now add an intercept to the sci-kit learn model. Plot all three models ROC curves on the same graph.
+
+#Initial Model Plots
+test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_hat_test)
+train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_hat_train)
+
+
+print('Custom Model Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('Custome Model Train AUC: {}'.format(auc(train_fpr, train_tpr)))
+
+plt.figure(figsize=(10,8))
+lw = 2
+plt.plot(test_fpr, test_tpr, color='darkorange',
+         lw=lw, label='Custom Model Test ROC curve')
+plt.plot(train_fpr, train_tpr, color='blue',
+         lw=lw, label='Custom Model Train ROC curve')
+
+
+
+#Second Model Plots
+y_test_score = logreg.decision_function(X_test)
+y_train_score = logreg.decision_function(X_train)
+
+test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
+train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
+
+print('Sci-kit learn Model 1 Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('Sci-kit learn Model 1 Train AUC: {}'.format(auc(train_fpr, train_tpr)))
+
+
+plt.plot(test_fpr, test_tpr, color='yellow',
+         lw=lw, label='Sci-kit learn Model 1 Test ROC curve')
+plt.plot(train_fpr, train_tpr, color='gold',
+         lw=lw, label='Sci-kit learn Model 1 Train ROC curve')
+
+
+#Third Model Plots
+y_test_score = logregi.decision_function(X_test)
+y_train_score = logregi.decision_function(X_train)
+
+test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
+train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
+
+print('Sci-kit learn Model 2 with intercept Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('Sci-kit learn Model 2 with intercept Train AUC: {}'.format(auc(train_fpr, train_tpr)))
+
+
+plt.plot(test_fpr, test_tpr, color='purple',
+         lw=lw, label='Sci-kit learn Model 2 with intercept Test ROC curve')
+plt.plot(train_fpr, train_tpr, color='red',
+         lw=lw, label='Sci-kit learn Model 2 with intercept Train ROC curve')
+
+#Formatting
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.yticks([i/20.0 for i in range(21)])
+plt.xticks([i/20.0 for i in range(21)])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
 ```
+
+    Custom Model Test AUC: 0.8996515679442508
+    Custome Model Train AUC: 0.9291038858049168
+    Sci-kit learn Model 1 Test AUC: 0.8996515679442508
+    Sci-kit learn Model 1 Train AUC: 0.9291038858049168
+    Sci-kit learn Model 2 with intercept Test AUC: 0.8989547038327527
+    Sci-kit learn Model 2 with intercept Train AUC: 0.9325931800158604
+
+
+
+![png](index_files/index_23_1.png)
+
 
 ## Altering the Regularization Parameter
 
-Now, experiment with altering the regularization parameter. At minimum, create 5 different subplots with varying regularization (C) parameters. For each, plot the ROC curve of the train and test set for that specific model.
+Now, experiment with altering the regularization parameter. At minimum, create 5 different subplots with varying regularization (C) parameters. For each, plot the ROC curve of the train and test set for that specific model.  
+
+Regularization parameters between 1 and 20 are recommended. Observe the difference in test and train auc as you go along.
 
 
 ```python
-## Comment on how the Regularization Parameter Impacts the ROC curves plotted above
+fig, axes = plt.subplots(4,2, figsize=(15,15))
+for n in range(8):
+    i = n%4
+    j = n//4
+    ax = axes[i,j]
+    #Fit a model
+    logreg = LogisticRegression(fit_intercept=True, C=1.5**(n))
+    logreg.fit(X_train, y_train)
+    #Print Stats
+    y_test_score = logreg.decision_function(X_test)
+    y_train_score = logreg.decision_function(X_train)
+
+    test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
+    train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
+    
+    test_auc = auc(test_fpr, test_tpr)
+    train_auc = auc(train_fpr, train_tpr)
+    auc_diff = round(train_auc - test_auc, 4)
+
+#     print('Test AUC with C=10^{}: {}'.format(n*2, auc(test_fpr, test_tpr)))
+#     print('Train AUCwith C=10^{}: {}'.format(n*2, auc(train_fpr, train_tpr)))
+    # Add the plot
+    ax.plot(test_fpr, test_tpr, color='darkorange',
+         lw=lw, label='Test ROC curve')
+    ax.plot(train_fpr, train_tpr, color='blue',
+             lw=lw, label='train ROC curve')
+    
+    ax.set_title('Regularization Parameter set to: 10^{}\nDifference in Test/Train AUC: {}'.format(n, auc_diff))
+
 ```
+
+
+![png](index_files/index_25_0.png)
+
+
+## Comment on how the Regularization Parameter Impacts the ROC curves plotted above
+
+#Your response here
+
+As the C parameter increases, we reduce regularization. As such, we see (slightly) larger differences in the AUC score between the test and train set demonstrating potentially (mild) overfitting when we remove regularization.
 
 ## Summary
 
