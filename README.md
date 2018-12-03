@@ -1,5 +1,5 @@
 
-## Logistic Regression Model Comparisons
+# Logistic Regression Model Comparisons - Lab
 
 ## Introduction
 
@@ -8,7 +8,7 @@ In this lab, we will further investigate some comparisons between our personal l
 ## Objectives
 
 * Understand and implement logistic regression
-* Compare logistic model outputs
+* Compare logistic regression outputs
 
 In the previous lab, we were able to recreat a logistic regression model output from sci-kit learn that did not include an intercept of regularization. Here, you will continue to analyze the impact of several tuning parameters including the intercept, and regularization parameter which we have not discussed previously.
 
