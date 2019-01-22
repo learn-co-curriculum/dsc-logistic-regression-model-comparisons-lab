@@ -1,5 +1,5 @@
 
-## Logistic Regression Model Comparisons
+## Logistic Regression Model Comparisons - Lab
 
 ## Introduction
 
