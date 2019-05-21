@@ -3,14 +3,14 @@
 
 ## Introduction
 
-In this lab, we will further investigate some comparisons between our personal logistic regression implementation, that of sci-kit learn and further tuning parameters that can be adjusted in the model.
+In this lab, you'll further investigate how to tune your personal logistic regression implementation, as well as that of sci-kit learn in order to produce better models.
 
 ## Objectives
 
 * Understand and implement logistic regression
 * Compare logistic model outputs
 
-In the previous lab, we were able to recreat a logistic regression model output from sci-kit learn that did not include an intercept of regularization. Here, you will continue to analyze the impact of several tuning parameters including the intercept, and regularization parameter which we have not discussed previously.
+In the previous lab, you were able to verify your manual logistic regression model output using sci-kit learn. However, that model did not include an intercept or any regularization. In this investigative lab, you will analyze the impact these two tuning parameters.
 
 ## Importing the Data
 
@@ -23,7 +23,7 @@ As with the previous lab, import the dataset stored in **heart.csv**
 
 ## Problem Formulation
 
-Define X and y as with the previous lab. This time, follow best practices and also implementk a standard train-test split.  
+Define X and y as with the previous lab. This time, follow best practices and also implement a standard train-test split.  
 **For consistency of results, use random_state=17.**
 
 
@@ -119,4 +119,4 @@ Regularization parameters between 1 and 20 are recommended. Observe the differen
 
 ## Summary
 
-In this lesson, we reviewed many of the accuracy measures of classification algorithms and observed the impact of additional tuning parameters such as regularization.
+In this lab, you reviewed many of the accuracy measures for classification algorithms and observed the impact of additional tuning models using intercepts and regularization.
