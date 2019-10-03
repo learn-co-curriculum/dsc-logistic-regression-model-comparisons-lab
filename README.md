@@ -3,14 +3,14 @@
 
 ## Introduction
 
-In this lab, you'll further investigate how to tune your personal logistic regression implementation, as well as that of sci-kit learn in order to produce better models.
+In this lab, you'll further investigate how to tune your own logistic regression implementation, as well as that of scikit-learn in order to produce better models.
 
 ## Objectives
 
 * Understand and implement logistic regression
 * Compare logistic model outputs
 
-In the previous lab, you were able to verify your manual logistic regression model output using sci-kit learn. However, that model did not include an intercept or any regularization. In this investigative lab, you will analyze the impact these two tuning parameters.
+In the previous lab, you were able to verify your manual logistic regression model output using scikit-learn. However, that model did not include an intercept or any regularization. In this investigative lab, you will analyze the impact of these two tuning parameters.
 
 ## Importing the Data
 
@@ -346,7 +346,7 @@ plt.show()
 
 ## Create a confusion matrix for your predictions
 
-Use a standard decision boundary of .5 to convert your probabilities output by logistic regression into binary classifications. (Again this should be for the test set.) Afterwards, feel free to use the built in sci-kit learn methods to compute the confusion matrix as we discussed in previous sections.
+Use a standard decision boundary of .5 to convert your probabilities output by logistic regression into binary classifications. (Again this should be for the test set.) Afterward, feel free to use the built-in scikit-learn methods to compute the confusion matrix as we discussed in previous sections.
 
 
 ```python
@@ -411,9 +411,9 @@ plt.colorbar()
 ![png](index_files/index_22_1.png)
 
 
-## Initial Model - sci-kit learn
+## Initial Model - scikit-learn
 
-Do the same using the built in method from sci-kit learn. To start, create an identical model as you did in the last section; turn off the intercept and set the regularization parameter, C, to a ridiculously large number such as 1e16. 
+Do the same using the built-in method from scikit-learn. To start, create an identical model as you did in the last section; turn off the intercept and set the regularization parameter, C, to a ridiculously large number such as 1e16. 
 
 
 ```python
@@ -440,7 +440,7 @@ logreg.fit(X_train, y_train)
 
 
 
-## Create an ROC Curve for the sci-kit learn model
+## Create an ROC Curve for the scikit-learn model
 
 
 ```python
@@ -528,7 +528,7 @@ plt.show()
 
 ## Adding an Intercept
 
-Now add an intercept to the sci-kit learn model. Keep the regularization parameter C set to a very large number such as 1e16. Plot all three models ROC curves on the same graph.
+Now add an intercept to the scikit-learn model. Keep the regularization parameter C set to a very large number such as 1e16. Plot all three models ROC curves on the same graph.
 
 
 ```python
@@ -567,14 +567,14 @@ y_train_score = logreg.decision_function(X_train)
 test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
 train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
 
-print('Sci-kit learn Model 1 Test AUC: {}'.format(auc(test_fpr, test_tpr)))
-print('Sci-kit learn Model 1 Train AUC: {}'.format(auc(train_fpr, train_tpr)))
+print('Scikit learn Model 1 Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('Scikit learn Model 1 Train AUC: {}'.format(auc(train_fpr, train_tpr)))
 
 
 plt.plot(test_fpr, test_tpr, color='yellow',
-         lw=lw, label='Sci-kit learn Model 1 Test ROC curve')
+         lw=lw, label='Scikit learn Model 1 Test ROC curve')
 plt.plot(train_fpr, train_tpr, color='gold',
-         lw=lw, label='Sci-kit learn Model 1 Train ROC curve')
+         lw=lw, label='Scikit learn Model 1 Train ROC curve')
 
 
 #Third Model Plots
@@ -584,14 +584,14 @@ y_train_score = logregi.decision_function(X_train)
 test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_test_score)
 train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_train_score)
 
-print('Sci-kit learn Model 2 with intercept Test AUC: {}'.format(auc(test_fpr, test_tpr)))
-print('Sci-kit learn Model 2 with intercept Train AUC: {}'.format(auc(train_fpr, train_tpr)))
+print('Scikit learn Model 2 with intercept Test AUC: {}'.format(auc(test_fpr, test_tpr)))
+print('Scikit learn Model 2 with intercept Train AUC: {}'.format(auc(train_fpr, train_tpr)))
 
 
 plt.plot(test_fpr, test_tpr, color='purple',
-         lw=lw, label='Sci-kit learn Model 2 with intercept Test ROC curve')
+         lw=lw, label='Scikit learn Model 2 with intercept Test ROC curve')
 plt.plot(train_fpr, train_tpr, color='red',
-         lw=lw, label='Sci-kit learn Model 2 with intercept Train ROC curve')
+         lw=lw, label='Scikit learn Model 2 with intercept Train ROC curve')
 
 #Formatting
 plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
@@ -620,7 +620,7 @@ plt.show()
 
 ## Altering the Regularization Parameter
 
-Now, experiment with altering the regularization parameter. At minimum, create 5 different subplots with varying regularization (C) parameters. For each, plot the ROC curve of the train and test set for that specific model.  
+Now, experiment with altering the regularization parameter. At a minimum, create 5 different subplots with varying regularization (C) parameters. For each, plot the ROC curve of the train and test set for that specific model.  
 
 Regularization parameters between 1 and 20 are recommended. Observe the difference in test and train auc as you go along.
 
