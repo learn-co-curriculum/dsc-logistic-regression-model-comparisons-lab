@@ -1,5 +1,4 @@
-
-## Logistic Regression Model Comparisons - Lab
+# Logistic Regression Model Comparisons - Lab
 
 ## Introduction
 
@@ -380,7 +379,9 @@ plt.show()
 
 
 
+    
 ![png](index_files/index_16_1.png)
+    
 
 
 ## Update your ROC curve to include the training set
@@ -462,7 +463,9 @@ plt.show()
 
 
 
+    
 ![png](index_files/index_19_1.png)
+    
 
 
 ## Create a confusion matrix for your predictions
@@ -595,7 +598,9 @@ plt.show()
 
 
 
+    
 ![png](index_files/index_28_1.png)
+    
 
 
 ## Add an Intercept
@@ -770,7 +775,9 @@ plt.show()
 
 
 
+    
 ![png](index_files/index_34_1.png)
+    
 
 
 ## Altering the Regularization Parameter
@@ -819,7 +826,9 @@ for n in range(8):
 ```
 
 
+    
 ![png](index_files/index_37_0.png)
+    
 
 
 How did the regularization parameter impact the ROC curves plotted above? 
