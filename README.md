@@ -2,17 +2,34 @@
 
 ## Introduction
 
-In this lab, you'll further investigate how to tune your own logistic regression implementation, as well as that of scikit-learn in order to produce better models.
+In this lab, you'll investigate using scikit-learn with regularization in order to produce better models.
 
 ## Objectives
 
 - Compare the different inputs with logistic regression models and determine the optimal model 
 
-In the previous lab, you were able to compare the output of your own implementation of the logistic regression model with that of scikit-learn. However, that model did not include an intercept or any regularization. In this investigative lab, you will analyze the impact of these two tuning parameters.
+
+```python
+# Import the necessary packages
+```
+
+
+```python
+# __SOLUTION__ 
+
+# Importing packages
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_curve, auc
+```
 
 ## Import the data
 
-As with the previous lab, import the dataset stored in `'heart.csv'`: 
+Import the dataset stored in `'heart.csv'`.
 
 
 ```python
@@ -28,7 +45,7 @@ df = None
 ```python
 # __SOLUTION__ 
 # Import the data
-import pandas as pd
+
 df = pd.read_csv('heart.csv')
 
 # Print the first five rows of the data
@@ -166,7 +183,7 @@ df.head()
 
 ## Split the data
 
-Define `X` and `y` as with the previous lab. This time, follow best practices and also implement a standard train-test split. Assign 25% to the test set and set the `random_state` to 17. 
+Define `X` and `y` where the latter is the `target` variable. This time, follow best practices and also implement a standard train-test split. Assign 25% to the test set and set the `random_state` to 17. 
 
 
 ```python
@@ -189,313 +206,27 @@ y = df['target']
 X = df.drop(columns=['target'], axis=1)
 
 # Split the data into training and test sets
-from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=17)
 print(y_train.value_counts(),'\n\n', y_test.value_counts())
 ```
 
+    target
     1.0    130
     0.0     97
-    Name: target, dtype: int64 
+    Name: count, dtype: int64 
     
-     0.0    41
+     target
+    0.0    41
     1.0    35
-    Name: target, dtype: int64
-
-
-## Initial Model - Personal Implementation
-
-Use your code from the previous lab to once again train a logistic regression algorithm on the training set.
-
-
-```python
-# Your code from previous lab
-import numpy as np
-
-def sigmoid(x):
-    x = np.array(x)
-    return 1/(1 + np.e**(-1*x))
-
-def grad_desc(X, y, max_iterations, alpha, initial_weights=None):
-    """Be sure to set default behavior for the initial_weights parameter."""
-    if initial_weights is None:
-        initial_weights = np.ones((X.shape[1], 1)).flatten()
-    weights_col = pd.DataFrame(initial_weights)
-    weights = initial_weights
-    # Create a for loop of iterations
-    for iteration in range(max_iterations):
-        # Generate predictions using the current feature weights
-        predictions = sigmoid(np.dot(X, weights))
-        # Calculate an error vector based on these initial predictions and the correct labels
-        error_vector = y - predictions
-        # Calculate the gradient 
-        # As we saw in the previous lab, calculating the gradient is often the most difficult task.
-        # Here, your are provided with the closed form solution for the gradient of the log-loss function derived from MLE
-        # For more details on the derivation, see the additional resources section below.
-        gradient = np.dot(X.transpose(), error_vector)
-        # Update the weight vector take a step of alpha in direction of gradient 
-        weights += alpha * gradient
-        weights_col = pd.concat([weights_col, pd.DataFrame(weights)], axis=1)
-    # Return finalized weights
-    return weights, weights_col
-
-weights, weights_col = grad_desc(X_train, y_train, 50000, 0.001)
-```
-
-
-```python
-# __SOLUTION__ 
-import numpy as np
-
-def sigmoid(x):
-    x = np.array(x)
-    return 1/(1 + np.e**(-1*x))
-
-def grad_desc(X, y, max_iterations, alpha, initial_weights=None):
-    """Be sure to set default behavior for the initial_weights parameter."""
-    if initial_weights is None:
-        initial_weights = np.ones((X.shape[1], 1)).flatten()
-    weights_col = pd.DataFrame(initial_weights)
-    weights = initial_weights
-    # Create a for loop of iterations
-    for iteration in range(max_iterations):
-        # Generate predictions using the current feature weights
-        predictions = sigmoid(np.dot(X, weights))
-        # Calculate an error vector based on these initial predictions and the correct labels
-        error_vector = y - predictions
-        # Calculate the gradient 
-        # As we saw in the previous lab, calculating the gradient is often the most difficult task.
-        # Here, your are provided with the closed form solution for the gradient of the log-loss function derived from MLE
-        # For more details on the derivation, see the additional resources section below.
-        gradient = np.dot(X.transpose(), error_vector)
-        # Update the weight vector take a step of alpha in direction of gradient 
-        weights += alpha * gradient
-        weights_col = pd.concat([weights_col, pd.DataFrame(weights)], axis=1)
-    # Return finalized weights
-    return weights, weights_col
-
-weights, weights_col = grad_desc(X_train, y_train, 50000, 0.001)
-```
-
-## Make [probability] predictions on the test set
-
-
-```python
-# Predict on test set
-y_hat_test = None
-np.round(y_hat_test, 2)
-```
-
-
-```python
-# __SOLUTION__ 
-# Predict on test set
-y_hat_test = sigmoid(np.dot(X_test, weights))
-np.round(y_hat_test, 2)
-```
-
-
-
-
-    array([0.96, 0.02, 0.09, 0.12, 0.  , 1.  , 0.25, 0.94, 0.  , 0.8 , 0.04,
-           0.69, 0.53, 0.  , 0.99, 0.59, 0.69, 0.01, 0.99, 0.03, 0.98, 0.98,
-           0.03, 0.78, 0.76, 0.78, 0.  , 0.08, 0.02, 0.01, 0.74, 0.02, 0.99,
-           0.05, 0.35, 0.99, 0.85, 0.31, 0.78, 0.99, 0.97, 0.14, 0.  , 0.01,
-           0.96, 0.9 , 0.98, 0.73, 0.02, 0.  , 0.98, 0.  , 0.  , 0.68, 0.85,
-           0.  , 0.66, 0.6 , 0.01, 0.97, 0.07, 0.  , 0.98, 0.43, 0.91, 0.08,
-           0.81, 0.99, 0.01, 0.26, 0.68, 0.18, 0.98, 0.02, 0.96, 0.94])
-
-
-
-## Create an ROC curve for your predictions
-
-
-```python
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-import seaborn as sns
-%matplotlib inline
-
-test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_hat_test)
-
-print('AUC: {}'.format(auc(test_fpr, test_tpr)))
-
-# Seaborn's beautiful styling
-sns.set_style('darkgrid', {'axes.facecolor': '0.9'})
-
-plt.figure(figsize=(10, 8))
-lw = 2
-
-plt.plot(test_fpr, test_tpr, color='darkorange',
-         lw=lw, label='Test ROC curve')
-
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.yticks([i/20.0 for i in range(21)])
-plt.xticks([i/20.0 for i in range(21)])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic (ROC) Curve')
-plt.legend(loc='lower right')
-plt.show()
-```
-
-
-```python
-# __SOLUTION__ 
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-import seaborn as sns
-%matplotlib inline
-
-test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_hat_test)
-
-print('Test AUC: {}'.format(auc(test_fpr, test_tpr)))
-
-# Seaborn's beautiful styling
-sns.set_style('darkgrid', {'axes.facecolor': '0.9'})
-
-plt.figure(figsize=(10, 8))
-lw = 2
-
-plt.plot(test_fpr, test_tpr, color='darkorange',
-         lw=lw, label='Test ROC curve')
-
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.yticks([i/20.0 for i in range(21)])
-plt.xticks([i/20.0 for i in range(21)])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic (ROC) Curve')
-plt.legend(loc='lower right')
-plt.show()
-```
-
-    Test AUC: 0.8996515679442508
-
-
-
-    
-![png](index_files/index_16_1.png)
-    
-
-
-## Update your ROC curve to include the training set
-
-
-```python
-y_hat_train = None
-
-train_fpr, train_tpr, train_thresholds = None
-
-test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_hat_test)
-
-# Train AUC
-print('Train AUC: {}'.format( None ))
-print('AUC: {}'.format(auc(test_fpr, test_tpr)))
-
-# Seaborn's beautiful styling
-sns.set_style('darkgrid', {'axes.facecolor': '0.9'})
-
-plt.figure(figsize=(10, 8))
-lw = 2
-
-plt.plot(train_fpr, train_tpr, color='blue',
-         lw=lw, label='Train ROC curve')
-plt.plot(test_fpr, test_tpr, color='darkorange',
-         lw=lw, label='Test ROC curve')
-
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.yticks([i/20.0 for i in range(21)])
-plt.xticks([i/20.0 for i in range(21)])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic (ROC) Curve')
-plt.legend(loc='lower right')
-plt.show()
-```
-
-
-```python
-# __SOLUTION__ 
-# Your code here
-y_hat_train = sigmoid(np.dot(X_train, weights))
-
-test_fpr, test_tpr, test_thresholds = roc_curve(y_test, y_hat_test)
-
-train_fpr, train_tpr, train_thresholds = roc_curve(y_train, y_hat_train)
-
-# Train AUC
-print('Train AUC: {}'.format(auc(train_fpr, train_tpr)))
-print('Test AUC: {}'.format(auc(test_fpr, test_tpr)))
-
-# Seaborn's beautiful styling
-sns.set_style('darkgrid', {'axes.facecolor': '0.9'})
-
-plt.figure(figsize=(10,8))
-lw = 2
-
-plt.plot(train_fpr, train_tpr, color='blue',
-         lw=lw, label='Train ROC curve')
-plt.plot(test_fpr, test_tpr, color='darkorange',
-         lw=lw, label='Test ROC curve')
-
-plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.yticks([i/20.0 for i in range(21)])
-plt.xticks([i/20.0 for i in range(21)])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic (ROC) Curve')
-plt.legend(loc='lower right')
-plt.show()
-```
-
-    Train AUC: 0.9291038858049168
-    Test AUC: 0.8996515679442508
-
-
-
-    
-![png](index_files/index_19_1.png)
-    
-
-
-## Create a confusion matrix for your predictions
-
-Use a standard decision boundary of 0.5 to convert your probabilities output by logistic regression into binary classifications. (Again this should be for the test set.) Afterward, feel free to use the built-in scikit-learn function to compute the confusion matrix as we discussed in previous sections.
-
-
-```python
-# Your code here
-```
-
-
-```python
-# __SOLUTION__ 
-from sklearn.metrics import confusion_matrix
-
-test_predictions = (y_hat_test >= 0.5).astype('int')
-
-cnf_matrix = confusion_matrix(test_predictions, y_test)
-
-print(cnf_matrix)
-```
-
-    [[32  4]
-     [ 9 31]]
+    Name: count, dtype: int64
 
 
 ## Initial Model - scikit-learn
 
-Use scikit-learn to build a similar model. To start, create an identical model as you did in the last section; turn off the intercept and set the regularization parameter, `C`, to a ridiculously large number such as 1e16. 
+Use scikit-learn to build the logistic regression model.
+
+Turn off the intercept and set the regularization parameter, `C`, to a ridiculously large number such as 1e16. 
 
 
 ```python
@@ -506,7 +237,6 @@ Use scikit-learn to build a similar model. To start, create an identical model a
 ```python
 # __SOLUTION__ 
 # Your code here
-from sklearn.linear_model import LogisticRegression
 
 logreg = LogisticRegression(fit_intercept=False, C=1e16, solver='liblinear')
 logreg.fit(X_train, y_train)
@@ -515,17 +245,13 @@ logreg.fit(X_train, y_train)
 
 
 
-    LogisticRegression(C=1e+16, class_weight=None, dual=False, fit_intercept=False,
-                       intercept_scaling=1, l1_ratio=None, max_iter=100,
-                       multi_class='warn', n_jobs=None, penalty='l2',
-                       random_state=None, solver='liblinear', tol=0.0001, verbose=0,
-                       warm_start=False)
+<style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LogisticRegression(C=1e+16, fit_intercept=False, solver=&#x27;liblinear&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(C=1e+16, fit_intercept=False, solver=&#x27;liblinear&#x27;)</pre></div></div></div></div></div>
 
 
 
 ## Create an ROC Curve for the scikit-learn model
 
-Use both the training and test sets
+Use both the training and test sets.
 
 
 ```python
@@ -599,7 +325,7 @@ plt.show()
 
 
     
-![png](index_files/index_28_1.png)
+![png](index_files/index_14_1.png)
     
 
 
@@ -625,13 +351,27 @@ logregi.fit(X_train, y_train)
 
 
 
-    LogisticRegression(C=1e+16, class_weight=None, dual=False, fit_intercept=True,
-                       intercept_scaling=1, l1_ratio=None, max_iter=100,
-                       multi_class='warn', n_jobs=None, penalty='l2',
-                       random_state=None, solver='liblinear', tol=0.0001, verbose=0,
-                       warm_start=False)
+<style>#sk-container-id-2 {color: black;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LogisticRegression(C=1e+16, solver=&#x27;liblinear&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(C=1e+16, solver=&#x27;liblinear&#x27;)</pre></div></div></div></div></div>
 
 
+
+Generate predictions for the training and test sets.
+
+
+```python
+# Generate predictions
+y_hat_train = None
+y_hat_test = None
+```
+
+
+```python
+# __SOLUTION__ 
+
+# Generate predictions
+y_hat_train = logreg.predict(X_train)
+y_hat_test = logreg.predict(X_test)
+```
 
 Plot all three models ROC curves on the same graph.
 
@@ -766,8 +506,8 @@ plt.legend(loc="lower right")
 plt.show()
 ```
 
-    Custom Model Test AUC: 0.8996515679442508
-    Custome Model Train AUC: 0.9291038858049168
+    Custom Model Test AUC: 0.8331010452961672
+    Custome Model Train AUC: 0.8519825535289453
     Scikit-learn Model 1 Test AUC: 0.8996515679442508
     Scikit-learn Model 1 Train AUC: 0.9291038858049168
     Scikit-learn Model 2 with intercept Test AUC: 0.8989547038327527
@@ -776,7 +516,7 @@ plt.show()
 
 
     
-![png](index_files/index_34_1.png)
+![png](index_files/index_23_1.png)
     
 
 
@@ -827,7 +567,7 @@ for n in range(8):
 
 
     
-![png](index_files/index_37_0.png)
+![png](index_files/index_26_0.png)
     
 
 
